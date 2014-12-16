@@ -9,7 +9,7 @@ Intuitively Template Haskell provides new language features that allow us to con
 
 It is reminiscent of the macro mechanism as found in Scheme or Lisp. While in Lisp the concrete syntax and the representation of the code, i.e. the abstract syntax tree, have no difference, the abstract syntax tree for TH is represented with normal Haskell data types.
 
-Metaprogramming can be used for the creation of DSL (Domain Specific Languages) and generative programming. Current common day uses of such techniques include DSLs, specific for testing (see Jasmine, Mocha) and modeling (html) -- and generative meta-programming is used in ORMs (Object-relational mapping) scripts and tools to map database schemas to objects with in web frameworks.
+Metaprogramming can be used for the creation of DSL (Domain Specific Languages) and generative programming. Current common day uses of such techniques include DSLs, specificially for testing (see Jasmine, Mocha) and modeling (html) -- and generative meta-programming is used in ORMs (Object-relational mapping) scripts/tools to map database schemas to objects.
 
 ---
 
