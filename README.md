@@ -13,6 +13,9 @@ It is reminiscent of the macro mechanism as found in Scheme or Lisp. While in Li
 
 Metaprogramming can be used for the creation of DSL (Domain Specific Languages) and generative programming. Current common day uses of such techniques include DSLs, specificially for testing (see Jasmine, Mocha) and modeling (html) -- and generative meta-programming is used in ORMs (Object-relational mapping) scripts/tools to map database schemas to objects typically for web frameworks.
 
+Within the haskell community itself, much of Yesod uses Template Haskell. According to Michael Snoyman, this is so Yesod can keep type-safe without the error prone boiler-plate that generally accompanies it.
+
+In this article, I'll explain the basic features of template haskell -- how to use it -- go through some basic examples, and also talk about some of the downsides of using template haskell.
 
 ---
 
