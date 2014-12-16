@@ -7,7 +7,7 @@ Intuitively Template Haskell provides new language features that allow us to con
 
 It is reminiscent of the macro mechanism as found in Scheme or Lisp. While in Lisp the concrete syntax and the representation of the code, i.e. the abstract syntax tree, have no difference, the abstract syntax tree for TH is represented with normal Haskell data types.
 
-To get started, you need to use the flag `-XTemplateHaskell` to switch these syntactic extensions on.
+To get started, you need to use the flag `ghci -XTemplateHaskell` to switch these syntactic extensions on.
 
 #### Syntax
 * A splice is written $x, where x is an identifier, or $(...), where the "..." is an arbitrary expression. There must be no space between the "$" and the identifier or parenthesis. This use of "$" overrides its meaning as an infix operator, just as "M.x" overrides the meaning of "." as an infix operator. If you want the infix operator, put spaces around it.
