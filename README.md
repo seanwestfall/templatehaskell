@@ -13,7 +13,7 @@ At a glance, 'Quasi-quote' brackets `[|` and `|]` are used to get the abstract s
 
 Metaprogramming can be used for the creation of DSL (Domain Specific Languages) and generative programming. Current common day uses of such techniques include DSLs, specificially for testing (see Jasmine, Mocha) and modeling (html) -- and generative meta-programming is used in ORMs (Object-relational mapping) scripts/tools to map database schemas to objects typically for web frameworks.
 
-Within the haskell community itself, much of Yesod uses Template Haskell. Specifically it's used in the routing module for type-safe URLs and as a DSL for HTML template variable bindings. Template Haskell allows Yesod to use a single, well-tested piece type-safe module to do all of its routing and templating, avoiding a lot of boilerplate and sidestep bugs that would come with using combinators instead. It's also one of the key features that separate Yesod approach from a lot of other web frameworks.
+Within the haskell community itself, much of Yesod uses Template Haskell. Specifically it's used in the routing module for type-safe URLs and as a DSL for HTML template variable bindings. Template Haskell allows Yesod to use a single, well-tested piece type-safe module to do all of its routing and templating, avoiding a lot of boilerplate and sidestep bugs that would come with using combinators instead. It's also one of the key features that separate Yesod approach from all the other web frameworks.
 
 In this article, I'll explain the basic features of template haskell -- how to use it -- go through some basic examples, and also talk about some of the downsides of using template haskell.
 
