@@ -17,6 +17,7 @@ To get started, you need to use the flag `-XTemplateHaskell` to switch these syn
 ```bash
 $ ghci -XTemplateHaskell
 Prelude> :m + Language.Haskell.TH
+Prelude>
 ```
 
 #### Syntax
