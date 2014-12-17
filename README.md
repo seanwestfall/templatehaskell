@@ -113,6 +113,7 @@ In this example
 
 #### Example
   1. **A `printf` function**
+
 The most common example of using TH is the implementation of C's printf function. 
 
 ```haskell
@@ -173,7 +174,8 @@ Which should print out:
 ```bash
 Hello
 ```
-  2. **Generic zipWith**
+  2. **Generic `zipWith`**
+
 Another cool example is a generic zipWith function:
 
 `zipCons` allows one to zipWith almost any data. Demonstrates the ability to do dynamic binding with TH splices:
