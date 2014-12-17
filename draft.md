@@ -115,15 +115,33 @@ In this example
 
 #### Template Haskell AST
 In Template Haskell, ordinary algebraic data types represent Haskell program fragments. These types modeled after Haskell language syntax and represents AST (abstract syntax tree) of corresponding Haskell code. There is an Exp type to represent Haskell expressions, Pat – for patterns, Lit – for literals, Dec – for declarations, Type – for data types and so on. You can see definitions of all these types in the module Language.Haskell.TH.Syntax. These types refer to each other according to rules of Haskell syntax, so using them you can construct values representing any possible Haskell program fragments. Just some simple examples:
- * varx = VarE (mkName "x") represents expression x, i.e. simple variable “x”
- * patx = VarP (mkName "x") represents pattern x, i.e. the same variable “x” used in pattern
- * str = LitE (StringL "str") represents constant expression "str"
- * tuple = TupE [varx, str] represents tuple expression (x,"str")
- * LamE [patx] tuple represents lambda form (\x -> (x,"str"))
+ * `varx = VarE (mkName "x")` represents expression x, i.e. simple variable “x”
+ * `patx = VarP (mkName "x")` represents pattern x, i.e. the same variable “x” used in pattern
+ * `str = LitE (StringL "str")` represents constant expression `"str"`
+ * `tuple = TupE [varx, str]` represents tuple expression `(x,"str")`
+ * `LamE [patx]` tuple represents lambda form `(\x -> (x,"str"))`
 To make our life easier, all constructors of Exp type have names ending with “E”, of Pat type – ending with “P” and so on. Function mkName, used here, creates value of type Name (representing identifier) from String with name of this identifier.
 
 So, to generate some Haskell code, TH function must just create and return value of type Exp, which serve as representation for this chunk of code. You don’t even need to thoroughly learn Exp and other type’s definitions in order to know how to represent Haskell code you need – in the section Debugging I will say how you can print TH representation of any Haskell code chunk.
 
+#### Quotation Monad
+
+But TH functions are not pure functions returning values of type Exp. Instead, they are computations executed in special monad Q (called “quotation monad”), which allows to automatically generate unique names for variables using monadic operation newName::String->Q Name. This operation on each call generates unique name with given prefix. This name then may be used as part of pattern (by using constructor VarP::Name->Pat) and expressions (via VarE::Name->Exp).
+
+Let’s write simple TH example – TH function tupleReplicate, which when used as “$(tupleReplicate n) x” will return n-element tuple containing x in all positions (just like replicate does for lists). Please draw attention that “n” is an argument of TH function, while “x” is an argument to anonymous function (lambda form) it generates! I provide the whole module containing this function definition (module Language.Haskell.TH is an “external interface” to TH – it provides all the data types and functions which are used to write TH programs):
+
+```haskell
+module TupleReplicate where
+ 
+import Language.Haskell.TH
+ 
+tupleReplicate :: Int -> Q Exp
+tupleReplicate n = do id <- newName "x"
+                      return $ LamE (VarP id)
+                                    (TupE $ replicate n $ VarE id)
+```
+
+For example, call `tupleReplicate 3` returns `Exp` equivalent to Haskell expression `(\x -> (x,x,x))`.
 
 #### Examples
   1. **A `printf` function**
