@@ -113,7 +113,19 @@ In this example
   3. A reify inside the splice $(th2..) would see the definition of f, all the bindings created by $(th1..), and the definition of h.
   4. A reify inside the splice $(blah2) would see the same definitions as the splice $(th2...).
 
-#### Example
+#### Template Haskell AST
+In Template Haskell, ordinary algebraic data types represent Haskell program fragments. These types modeled after Haskell language syntax and represents AST (abstract syntax tree) of corresponding Haskell code. There is an Exp type to represent Haskell expressions, Pat – for patterns, Lit – for literals, Dec – for declarations, Type – for data types and so on. You can see definitions of all these types in the module Language.Haskell.TH.Syntax. These types refer to each other according to rules of Haskell syntax, so using them you can construct values representing any possible Haskell program fragments. Just some simple examples:
+ * varx = VarE (mkName "x") represents expression x, i.e. simple variable “x”
+ * patx = VarP (mkName "x") represents pattern x, i.e. the same variable “x” used in pattern
+ * str = LitE (StringL "str") represents constant expression "str"
+ * tuple = TupE [varx, str] represents tuple expression (x,"str")
+ * LamE [patx] tuple represents lambda form (\x -> (x,"str"))
+To make our life easier, all constructors of Exp type have names ending with “E”, of Pat type – ending with “P” and so on. Function mkName, used here, creates value of type Name (representing identifier) from String with name of this identifier.
+
+So, to generate some Haskell code, TH function must just create and return value of type Exp, which serve as representation for this chunk of code. You don’t even need to thoroughly learn Exp and other type’s definitions in order to know how to represent Haskell code you need – in the section Debugging I will say how you can print TH representation of any Haskell code chunk.
+
+
+#### Examples
   1. **A `printf` function**
 
 The most common example of using TH is the implementation of C's printf function. 
