@@ -112,6 +112,9 @@ In this example
   4. A reify inside the splice $(blah2) would see the same definitions as the splice $(th2...).
 
 #### Example
+
+The most common example of using TH is the implementation of C's printf function. 
+
 ```haskell
 {- Main.hs -}
 module Main where
@@ -169,6 +172,41 @@ $ ./main
 Which should print out:
 ```bash
 Hello
+```
+
+Another cool example is a generic zipWith function:
+
+```haskell
+zipCons :: Name -> Int -> [String] -> ExpQ
+zipCons tyName ways functions = do
+    let countFields :: Con -> (Name,Int)
+        countFields x = case x of
+            NormalC n (length -> fields) -> (n, fields)
+            RecC n (length -> fields) -> (n,fields)
+            InfixC _ n _ -> (n,2)
+            ForallC _ _ ct -> countFields ct
+ 
+    TyConI (DataD _ _ _ [countFields -> (c,n)] _) <- reify tyName
+    when (n /= length functions) $ fail "wrong number of functions named"
+    vs <- replicateM ways $ replicateM n $ newName "x"
+    lamE (map (conP c . map varP) vs) $
+        foldl (\con (vs,f) ->
+                  con `appE`
+                    foldl appE
+                        (dyn f)
+                        (map varE vs))
+              (conE c)
+              (transpose vs `zip` functions)
+```
+
+This example uses whichever '+' is in scope when the expression is spliced:
+
+```haskell
+:type $(zipCons ''(,,,) 2 (replicate 4 "+"))
+ 
+  $(zipCons ''(,,,) 2 (replicate 4 "+"))
+    :: (Num t, Num t1, Num t2, Num t3) =>
+        (t, t1, t2, t3) -> (t, t1, t2, t3) -> (t, t1, t2, t3)
 ```
 
 #### License
