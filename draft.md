@@ -124,7 +124,7 @@ To make our life easier, all constructors of Exp type have names ending with “
 
 So, to generate some Haskell code, TH function must just create and return value of type Exp, which serve as representation for this chunk of code. Many developers drop TH because of the complexities of this step.
 
-#### Quotation Monad
+#### Generating Unique Names with the Quotation Monad
 
 But TH functions are not pure functions returning values of type Exp. Instead, they are computations executed in special monad Q (called “quotation monad”), which allows to automatically generate unique names for variables using monadic operation `newName::String->Q Name`. This operation on each call generates unique name with given prefix. This name then may be used as part of pattern (by using constructor `VarP::Name->Pat`) and expressions (via `VarE::Name->Exp`).
 
