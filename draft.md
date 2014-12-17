@@ -3,7 +3,7 @@ Template Haskell
 A contribution to Oliver Charles' [24 Days of GHC Extensions](https://ocharles.org.uk/blog/pages/2014-12-01-24-days-of-ghc-extensions.html)
 
 
-~~Template Haskell is a Haskell extension that supports compile­time meta­programming. The purpose of the system is to support the algorithmic construction of programs at compile­time. The ability to generate code at compile time allows the programmer to use programming techniques not available in Haskell itself, such as macro­like expansion, user directed optimization (such as inlining), polytypic programs, generation of supporting data structures and functions from existing data structures and functions. ~~
+~~Template Haskell is a Haskell extension that supports compile­time meta­programming. The purpose of the system is to support the algorithmic construction of programs at compile­time. The ability to generate code at compile time allows the programmer to use programming techniques not available in Haskell itself, such as macro­like expansion, user directed optimization (such as inlining), polytypic programs, generation of supporting data structures and functions from existing data structures and functions.~~
 
 Template Haskell is an extension to Haskell 98 that allows you to do type-safe compile-time meta-programming, with Haskell both as the manipulating language and the language being manipulated. It was introduced in 2002 by Tim Sheard and Simon Peyton Jones. The original paper can be found [here](http://research.microsoft.com/en-us/um/people/simonpj/papers/meta-haskell/meta-haskell.pdf), and the current API can be found [here](http://hackage.haskell.org/package/template-haskell).
 
