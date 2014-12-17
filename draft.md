@@ -126,9 +126,9 @@ So, to generate some Haskell code, TH function must just create and return value
 
 #### Quotation Monad
 
-But TH functions are not pure functions returning values of type Exp. Instead, they are computations executed in special monad Q (called “quotation monad”), which allows to automatically generate unique names for variables using monadic operation newName::String->Q Name. This operation on each call generates unique name with given prefix. This name then may be used as part of pattern (by using constructor VarP::Name->Pat) and expressions (via VarE::Name->Exp).
+But TH functions are not pure functions returning values of type Exp. Instead, they are computations executed in special monad Q (called “quotation monad”), which allows to automatically generate unique names for variables using monadic operation `newName::String->Q Name`. This operation on each call generates unique name with given prefix. This name then may be used as part of pattern (by using constructor `VarP::Name->Pat`) and expressions (via `VarE::Name->Exp`).
 
-Let’s write simple TH example – TH function tupleReplicate, which when used as “$(tupleReplicate n) x” will return n-element tuple containing x in all positions (just like replicate does for lists). Please draw attention that “n” is an argument of TH function, while “x” is an argument to anonymous function (lambda form) it generates! I provide the whole module containing this function definition (module Language.Haskell.TH is an “external interface” to TH – it provides all the data types and functions which are used to write TH programs):
+Let’s write simple TH example – TH function tupleReplicate, which when used as `$(tupleReplicate n) x` will return n-element tuple containing x in all positions (just like replicate does for lists). Please draw attention that “n” is an argument of TH function, while “x” is an argument to anonymous function (lambda form) it generates! I provide the whole module containing this function definition (module Language.Haskell.TH is an “external interface” to TH – it provides all the data types and functions which are used to write TH programs):
 
 ```haskell
 module TupleReplicate where
