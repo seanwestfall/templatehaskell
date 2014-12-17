@@ -204,7 +204,31 @@ And repeat the last two steps until the end:
 It is interesting, that in this definition left side of lambda form (\x0 -> \x1...) is build recursively right on the stack of calls, while the right side (0+x1+...) is accumulated in the code variable. 
 
 #### Reification
+Reification is a Template Haskell’s way of allowing the programmer to query the state of the compiler’s internal (symbol) table. The monadic operation `reify::Name->Q Info` returns information about given name: if it’s a global identifier (function, constant, constructor) – you can get it’s type, if it’s a type or class – you can get its structure. By using reify you are get “entry point” to symbol’s table, which then can be used to find information about other types, constructors, classes related to this identifier. You can find definition of type Info in the module Language.Haskell.TH.Syntax.
 
+To get a Name, corresponding to identifier you are interested, you can, theoretically, use function mkName, but this solution is unsafe, because mkName returns unqualified name, which interpretation may be changed depending on context. On the other side, code `VarE id <- [| name |]` is safe, because id will be linked to qualified name (like `My.Own.Module.name`), but too verbose and need monadic context to run. So, Template Haskell supports another lightweight form of quotation: 'identifier returns Name, corresponding to identifier; `let id = 'name` is fully equivalent to `VarE id <- [| name |]`. Please note that this syntax construction has type Name (not Q Exp, nor Q Name), so it can be used in contexts where monadic computations are impossible, for example:
+
+```haskell
+f :: Exp ­> Exp
+f (App (Var m) e)  |  m=='map  =  ...
+```
+
+This new form is still a quotation construct, just like `[| v |]`, and follows the same rules as quotation brackets. For example, one cannot quote inside quotes, so this is illegal: `[| 'v |]`. The more important, that it is resolved statically, and returns fully qualified Name, whose meaning will be persistent.
+
+Haskell's name­spaces make things just slightly more complicated. The quotation `[| P |]` would mean the data constructor P, whereas `[t| P |]` would mean the type constructor P. So we need the same distinction for lightweight quoting. We use two single-quotes to distinguish the type context:
+
+'v means “The name v interpreted in an expression context”
+''v means “The name v interpreted in an type context”
+So ''a means the type variable a, for example.
+
+The reify function can be used to get structure of type, but it cannot be used to get Exp representing the body of already defined function. If you need to reify function body – put declaration of this function in quotation brackets and explore returned result, like this:
+```haskell
+$(optimize [d| fib = .... |])
+```
+or
+```haskell
+fib = $(optimize [| .... |])
+```
 #### Error reporting and recovery
 
 #### Debugging
