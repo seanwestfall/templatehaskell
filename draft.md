@@ -13,7 +13,7 @@ It is reminiscent of the macro mechanism as found in Scheme or Lisp. While in Li
 
 At a glance, 'Quasi-quote' brackets `[|` and `|]` are used to get the abstract syntax tree for the enclosed expression and 'splice' brackets `$(` and `)` are used to convert from abstract syntax tree into code.
 
-Metaprogramming can be used for the creation of DSL (Domain Specific Languages) and generative programming. Current common day uses of such techniques include DSLs, specificially for testing (see Jasmine, Mocha) and modeling (html) -- and generative meta-programming is used in ORMs (Object-relational mapping) scripts/tools to map database schemas to objects typically for web frameworks.
+Metaprogramming can be used for the creation of DSL (Domain Specific Languages) and generative programming. Current common day uses of such techniques include DSLs for testing (see Jasmine, Mocha) and modeling (html) -- and generative meta-programming is used in ORMs (Object-relational mapping) to map database schemas to objects (ubiquitiously used in web frameworks).
 
 Within the haskell community itself, much of Yesod uses Template Haskell. Specifically it's used in the routing module for type-safe URLs and as a DSL for HTML template variable bindings. Template Haskell allows Yesod to use a single, well-tested piece type-safe module to do all of its routing and templating, avoiding a lot of boilerplate and sidestep bugs that would come with using combinators instead. It's Yesod key feature that separates Yesod from all other web frameworks.
 
