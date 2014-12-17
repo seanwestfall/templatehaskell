@@ -297,6 +297,18 @@ import Language.Haskell.TH
 cnst :: Int -> String -> Q Exp
 cnst n s = return (LamE (replicate n WildP) (LitE (StringL s)))
 ```
+#### A QuasiQuoter
+```haskell
+fibs :: [Integer]
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+
+fibsQ :: Q Exp
+fibsQ = [| fibs |]
+
+fibQ :: Int -> Q Exp
+fibQ = [| fibs !! n |]
+```
+
 #### Examples
   1. **A `printf` function**
 
