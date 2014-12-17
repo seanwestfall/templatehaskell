@@ -308,7 +308,7 @@ fibsQ = [| fibs |]
 fibQ :: Int -> Q Exp
 fibQ = [| fibs !! n |]
 ```
-
+http://quasimal.com/posts/2012-05-25-quasitext-and-quasiquoting.html
 #### Examples
   1. **A `printf` function**
 
