@@ -203,8 +203,11 @@ And repeat the last two steps until the end:
 ```
 It is interesting, that in this definition left side of lambda form (\x0 -> \x1...) is build recursively right on the stack of calls, while the right side (0+x1+...) is accumulated in the code variable. 
 
-
 #### Reification
+
+#### Error reporting and recovery
+
+#### Debugging
 
 #### Examples
   1. **A `printf` function**
