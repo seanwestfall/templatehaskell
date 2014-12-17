@@ -122,7 +122,7 @@ In Template Haskell, ordinary algebraic data types represent Haskell program fra
  * `LamE [patx]` tuple represents lambda form `(\x -> (x,"str"))`
 To make our life easier, all constructors of Exp type have names ending with “E”, of Pat type – ending with “P” and so on. Function mkName, used here, creates value of type Name (representing identifier) from String with name of this identifier.
 
-So, to generate some Haskell code, TH function must just create and return value of type Exp, which serve as representation for this chunk of code. You don’t even need to thoroughly learn Exp and other type’s definitions in order to know how to represent Haskell code you need – in the section Debugging I will say how you can print TH representation of any Haskell code chunk.
+So, to generate some Haskell code, TH function must just create and return value of type Exp, which serve as representation for this chunk of code. Many developers drop TH because of the complexities of this step.
 
 #### Quotation Monad
 
