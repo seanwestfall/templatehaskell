@@ -230,6 +230,17 @@ or
 fib = $(optimize [| .... |])
 ```
 #### Error reporting and recovery
+The Q monad makes it possible to report errors, and recover from failures gracefully. Here is the interface:
+`report :: Bool ­> String ­> Q ()`
+Report something to the user. If the Bool is True, the something is treated as an error, otherwise it is simply displayed. In both cases, though, execution continues. The difference between the two is seen by recover; if there is no enclosing recover, compilation fails.
+`giveUp :: Q a`
+Stop execution; find the enclosing recover.
+`recover :: Q a ­> Q a ­> Q a`
+The call (recover h q) runs q. If q executes giveUp, execution resumes with h. If q runs to completion, but has made some calls to report True, the result is discarded and h is run. If q runs to completion with no error report, h is ignored, and q's result is the result of the call to recover.
+`currentModule :: Q String`
+Returns the name of the module being compiled.
+`currentLoc :: Q (FilePath, Int)`
+Returns the location of the top-level splice being executed.
 
 #### Debugging
 
