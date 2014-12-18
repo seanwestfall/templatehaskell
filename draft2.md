@@ -25,7 +25,8 @@ To see the AST syntax of some haskell code insert valid haskell syntax into oxfo
 Prelude Language.Haskell.TH> runQ [| 1 + 2 |]
 InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))
 ```
-If you parse through the parentices you'll see the return expression form a tree -- an abstract syntax tree!
+If you parse through the parentices you'll see the return expression forms a tree -- an abstract syntax tree!
+![abstract syntax tree](https://github.com/seanwestfall/templatehaskell/blob/master/syntax_tree.png)
 
 Checkout the lift class [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lift) to know what's going on exactly in the brackets. The Language.Haskell.TH.Syntax contains the defintions of all the types used in the AST. Using these types, it's possible to construct any fragment of the Haskell language, e.g. [Exp](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Exp), [Pat](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Pat), [Lit](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lit), etc. The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction. Quotations are lexically scoped.
 
