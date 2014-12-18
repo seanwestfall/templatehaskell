@@ -34,14 +34,14 @@ Let's bind the returned AST expression to a variable:
 ```bash
 Prelude Language.Haskell.TH> let myExp :: Q Exp; myExp = runQ [| 1 + 2 |]
 ```
-`myExp` contains the AST expression (notice the `Q Exp` type, more on this later) -- now lets use the splice brackets to return it back to haskell:
+`myExp` contains the AST expression (notice the `Q Exp` type, more on this later) -- now lets use the splice brackets, `$( ... )`, to return it back to haskell:
 ```bash
 Prelude Language.Haskell.TH> $(myExp)
 3
 ```
 Ta da, you converted concrete haskell to AST and back again.
 
-Now lets try out the splice brackets on some thing slightly more sophisticated: the fibonacci numbers using zipWith:
+Now lets try this on some thing slightly more sophisticated: the fibonacci sequence using zipWith:
 ```haskell
 let fibs :: [Integer]
     fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
@@ -103,7 +103,7 @@ GHC stage restriction:
 If you want to see the expansion use the flag `-ddump-splices` when starting GHCi. 
 
 #### Examples
-The most classic example of what you can do with Template Haskell is a type safe haskell version of c's printf function (from [stdio.h](http://www.gnu.org/software/libc/manual/html_node/Formatted-Output-Functions.html)):
+A good example to show what one can do with Template Haskell is a type safe haskell version of c's printf function (from [stdio.h](http://www.gnu.org/software/libc/manual/html_node/Formatted-Output-Functions.html)):
 
 *Main.hs*
 ```haskell
