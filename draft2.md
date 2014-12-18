@@ -27,7 +27,7 @@ InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))
 ```
 If you parse through the parentices you'll see the return expression form a tree -- an abstract syntax tree!
 
-Checkout the lift class [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lift) to know what's going on exactly in the brackets. The Language.Haskell.TH.Syntax contains the defintions of all the types used in the AST. Using these types, it's possible to construct any fragment of the Haskell language. The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction.
+Checkout the lift class [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lift) to know what's going on exactly in the brackets. The Language.Haskell.TH.Syntax contains the defintions of all the types used in the AST. Using these types, it's possible to construct any fragment of the Haskell language, e.g. [Exp](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Exp), [Pat](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Pat), [Lit](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lit), etc. The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction. Quotations are lexically scoped.
 
 Let's bind the returned AST expression to a variable:
 ```bash
@@ -65,25 +65,25 @@ Prelude Language.Haskell.TH> $(runQ [| fibs !! $( [| 8 |]) |])
 
 #### Syntax
 Template Haskell quotation expression come with 4 different parser types, and an extensive 5th optional type that allows one to define their own types of quotations, called quasi-quotations.
- * `[| ... |]`, or `[e| ... |]`, generates expression AST syntax; it has the type Q Exp.
+ * `[| ... |]`, or `[e| ... |]`, generates expression AST syntax; it has the type `Q Exp`.
    
    ```bash
    Prelude Language.Haskell.TH> runQ [| 1 + 2 |]
    InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))
    ```
- * `[d| ... |]`, generates a list of top-level declaration AST sytnax; it has the type Q [Dec].
+ * `[d| ... |]`, generates a list of top-level declaration AST sytnax; it has the type `Q [Dec]`.
    
    ```bash
    Prelude Language.Haskell.TH> runQ [d|x = 5|]
    [ValD (VarP x_4) (NormalB (LitE (IntegerL 5))) []]
    ```
- * `[t| ... |]`, generates a type AST syntax; it has the type Q Type.
+ * `[t| ... |]`, generates a type AST syntax; it has the type `Q Type`.
    
    ```bash
    Prelude Language.Haskell.TH> runQ [t|Int|]
    ConT GHC.Types.Int
    ```
- * `[p| ... |]`, generates a pattern AST syntax; it has the type Q Pat.
+ * `[p| ... |]`, generates a pattern AST syntax; it has the type `Q Pat`.
    
    ```bash
    Prelude Language.Haskell.TH> runQ [p|(x,y)|]
