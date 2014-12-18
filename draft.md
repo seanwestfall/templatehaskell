@@ -367,9 +367,6 @@ $ ghc --make -XTemplateHaskell main.hs -o main
 and then run
 ```bash
 $ ./main
-```
-Which should print out:
-```bash
 Hello
 ```
   2. **Generic `zipWith`**
