@@ -99,7 +99,7 @@ GHC stage restriction:
   and must be imported, not defined locally
 ```
 
-
+#### Debugging and Reification
 If you want to see the expansion use the flag `-ddump-splices` when starting GHCi. 
 
 #### Examples
