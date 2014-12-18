@@ -27,7 +27,7 @@ InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))
 ```
 If you parse through the parentices you'll see the return expression form a tree -- an abstract syntax tree!
 
-Checkout the lift class to see the actual [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lift) to know what's going on exactly. The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique name by appending an integer at the end of the expression name to handle scoping distinction.
+Checkout the lift class [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lift) to know what's going on exactly in the brackets. The Language.Haskell.TH.Syntax contains the defintions of all the types used in the AST. Using these types, it's possible to construct any fragment of the Haskell language. The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction.
 
 Let's bind the returned AST expression to a variable:
 ```bash
