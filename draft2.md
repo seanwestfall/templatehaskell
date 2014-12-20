@@ -8,7 +8,7 @@ In brief,  Oxford brackets `[|` and `|]` are used to get the abstract syntax tre
 
 Template Haskell was introduced by Tim Sheard and Simon Peyton Jones in their paper "Template Meta-Programming for Haskell" (The original paper can be found [here]()) in 2002, though its changed quite a bit since (see [here]()). It was inspired by C++ templates, though TH is functional more similar to a macro system. The Haskell extension Quasiquotation is often used in conjuntion with Template Haskell, so I will briefly describe it here, but is extensive enough only another full post could do it justice.
 
-In the wild, Template Haskell is used extensively by Yesod for routing and HTML template binding. Outside of Haskell, compile-time metaprogramming is used for the creation of Domain Specific Languages (DSLs), typically in the domains of testing and modeling, and generative metaprogramming (compile-time or not) for object relational mapping, typically for mapping database schemas to non-compiled code.
+In the wild, Template Haskell is used extensively by Yesod for routing and HTML template binding. Outside of Haskell, compile-time metaprogramming is used for the creation of Domain Specific Languages (DSLs), typically in the domains of testing and modeling, and generative metaprogramming (compile-time or not) for object relational mapping, typically for mapping database schemas to non-compiled code. And within Lisp, which is famous for it's macro system, metaprogramming is used to create syntax extensions (syntantic sugar), such as the syntax used for lisp comprehensions.
 
 ---
 _All code in this guide was excuted with GHCi version 7.6.3 and Template Haskell version 2.9.0.0_
