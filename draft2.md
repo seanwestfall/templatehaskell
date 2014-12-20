@@ -57,7 +57,7 @@ Prelude Language.Haskell.TH> let myExp :: Q Exp; myExp = runQ [| 1 + 2 |]
 Prelude Language.Haskell.TH> $(myExp)
 3
 ```
-Ta da, you converted concrete haskell to AST and back again.
+Ta da, you converted concrete haskell to AST and then evaluated it with the splice brackets.
 
 Now lets try this on some thing slightly more sophisticated: the fibonacci sequence using zipWith:
 ```haskell
