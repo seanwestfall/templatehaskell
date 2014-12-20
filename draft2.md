@@ -28,7 +28,25 @@ InfixE (Just (LitE (IntegerL 1))) (VarE GHC.Num.+) (Just (LitE (IntegerL 2)))
 If you parse through the parentices you'll see the return expression forms a tree -- an abstract syntax tree!
 ![abstract syntax tree](https://github.com/seanwestfall/templatehaskell/blob/master/syntax_tree.png)
 
-Checkout the lift class [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lift) to know what's going on exactly in the brackets. The Language.Haskell.TH.Syntax contains the defintions of all the types used in the AST. Using these types, it's possible to construct any fragment of the Haskell language, e.g. [Exp](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Exp), [Pat](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Pat), [Lit](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lit), etc. The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction. Quotations are lexically scoped (see the users guide [wiki](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html) for a more thorough explanation).
+Checkout the lift class [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#Lift), which is what's being invoked by the oxford brackets. The Language.Haskell.TH.Syntax contains the defintions of all the types used in the AST. Using these types, it's possible to construct any fragment of the Haskell language. Have a look at the Lit data type as an example. Lit stands for literal,
+```haskell
+data Lit = CharL Char 
+         | StringL String 
+         | IntegerL Integer     -- ^ Used for overloaded and non-overloaded
+                                -- literals. We don't have a good way to
+                                -- represent non-overloaded literals at
+                                -- the moment. Maybe that doesn't matter?
+         | RationalL Rational   -- Ditto
+         | IntPrimL Integer
+         | WordPrimL Integer
+         | FloatPrimL Rational
+         | DoublePrimL Rational
+         | StringPrimL String	-- ^ A primitive C-style string, type Addr#
+    deriving( Show, Eq, Data, Typeable )
+```
+tokens represented by it make up literals defined throughout your syntax in the AST. Within Language.Haskell.TH.syntax 35 generic data types are declared with the [Data.Data](http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Data.html) module. If you qurious about what the AST syntax is refering to study the [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#line-716).
+
+The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction (I'll show you an example in the next section). These unique integer indentifier are used to keep quotations are lexically scoped. (see the users guide [wiki](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html) for a more in depth explanation of TH's lexical scoping).
 
 Let's bind the returned AST expression to a variable:
 ```bash
