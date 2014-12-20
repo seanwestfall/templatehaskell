@@ -67,6 +67,9 @@ let fibs :: [Integer]
 
 let fibsQ :: Q Exp
     fibsQ = [| fibs |]
+-- > runQ [| fibs |]
+-- VarE fibs_1627391264
+-- The Q monad uses appended integer to give unique names to variables, and is also used to maintain lexical scoping.
 
 let fibQ :: Int -> Q Exp
     fibQ n = [| fibs !! n |]
