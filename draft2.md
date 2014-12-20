@@ -122,7 +122,16 @@ GHC stage restriction:
 ```
 
 #### Debugging and Reification
+You're probably wondering if you can evaluate a Q expression the other way, to see what the splice is evaluating. Ofcourse you can -- Run `runQ(Q exp) >>= putStrLn.pprint` to see what an expression with a Q Exp will evaluate to:
+```bash
+Prelude Language.Haskell.TH> let myExp :: Q Exp; myExp = runQ [| 1 + 2 |]
+Prelude Language.Haskell.TH> runQ(myExp) >>= putStrLn.pprint
+1 GHC.Num.+ 2
+```
+
 If you want to see the expansion use the flag `-ddump-splices` when starting GHCi. 
+
+Now for probably, what I consider to be the most confusing section of Template Haskell -- Reification.
 
 #### Examples
 A good example to show what one can do with Template Haskell is a type safe haskell version of c's printf function (from [stdio.h](http://www.gnu.org/software/libc/manual/html_node/Formatted-Output-Functions.html)):
