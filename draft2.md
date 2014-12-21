@@ -57,7 +57,14 @@ Prelude Language.Haskell.TH> let myExp :: Q Exp; myExp = runQ [| 1 + 2 |]
 Prelude Language.Haskell.TH> $(myExp)
 3
 ```
-Ta da, you converted concrete haskell to AST and then evaluated it with the splice brackets.
+and ta da, you converted concrete haskell to AST and then evaluated it with the splice brackets.
+
+You don't have to declare the expression to a variable to use the splice bracket on it, you can do it like this:
+```bash
+Prelude Language.Haskell.TH> $( return (InfixE (Just (LitE (IntegerL 1))) (VarE (mkName "+")) (Just (LitE (IntegerL 2)))))
+3
+```
+But as you can see, indentifiers have to be defined with the `mkName` type in the AST to evaluate properly.
 
 Now lets try this on some thing slightly more sophisticated: the fibonacci sequence using zipWith:
 ```haskell
@@ -85,7 +92,7 @@ Prelude Language.Haskell.TH> $(runQ [| fibs !! $( [| 8 |]) |])
 21
 ```
 
-If you're bored, good. I was just showing you the basics so you can get an intuitive feel for how to use the brackets. I'll talk about formal syntax next, and then when I get to debugging I'll show you so more fun examples.
+If you're bored, good. I was just showing you the basics so you can get an intuitive feel for how to use the brackets. I'll talk about formal syntax next, and then when I get to debugging I'll show you some more fun examples.
 
 #### Syntax
 Template Haskell quotation expression come with 4 different parser types, and an extensive 5th optional type that allows one to define their own types of quotations, called quasi-quotations.
@@ -115,6 +122,9 @@ Template Haskell quotation expression come with 4 different parser types, and an
    ```
  * Custom "quasi-quotations", have the form `["quoter"| ... |]`. The "quoter" can be anything except e, d, t, and p, and the token cannot contain spaces. Though, all GHC is doing is determing which parser to use based on the context within the oxford brackets.
 
+   Quasi-quotations are a big second part to meta-programming. They're essentially what makes it possible to write DSLs. I'm not going to cover it here since this guide is pretty long as it is, but if you're interested, there are many guides to using quasi-quotations, find them [here](https://www.cs.drexel.edu/~mainland/publications/mainland07quasiquoting.pdf), [here](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html#th-quasiquotation), and [here] (https://www.fpcomplete.com/user/marcin/quasiquotation-101)(this one assumes you're familar with Parsec parsing).
+
+
 An important restriction on Template Haskell to remember is _when inside a splice you can only call functions defined in imported modules, not functions defined elsewhere in the same module._ Quotations and splice have to be defined in separate modules, otherwise you'll see this error:
 ```bash
 GHC stage restriction:
@@ -134,10 +144,21 @@ If you want to see the expansion use the flag `-ddump-splices` when starting GHC
 
 Now for probably, what I consider to be the most confusing section of Template Haskell -- Reification.
 
-A pretty big part of the Language.Haskell.TH module is a section call reification. Reification allows one to query the state of an quotation expression and get infomation about it. Specifically, reift returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info).
-TH introduces two new indentifiers for this specific function. Prefix an expression quotation with a single quote, and prefix type quotations with a double quote. It gives the reify function some context inwhich to interpret.
+Reification allows one to query the state of an quotation expression or type and get infomation about it. Specifically, reify returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info), see the doc for specifically what -- but probably the most relavent information would be 
 
-_If you find reification confusing, so do I -- I don't like it either_ If you intend to use reify, don't use quotes in the names of your 
+TH introduces two new indentifiers for this specifically in reification. Prefix an expression quotation (`Q Exp`) with a single quote, and prefix type quotations (`Q Type`) with a double quote. It gives the reify function some context inwhich to interpret, and in which case will return the type for expressions and the structure for types. If you intend to use reify, don't use quotes in the names of your expressions -- otherwise it wont parse correctly.
+To use reify on a type, use double quotes:
+```bash
+Prelude Language.Haskell.TH> $(stringE . show =<< reify ''Bool)
+"TyConI (DataD [] GHC.Types.Bool [] [NormalC GHC.Types.False [],NormalC GHC.Types.True []] [])"
+```
+and to use it on an expression, use single quotes:
+```bash
+Prelude Language.Haskell.TH> $(stringE . show =<< reify 'myExp)
+"VarI myExp_1627395486 (AppT (ConT Language.Haskell.TH.Syntax.Q) (ConT Language.Haskell.TH.Syntax.Exp)) Nothing (Fixity 9 InfixL)"
+```
+
+_If you find reification confusing, so do I -- I don't like it either_ In all the guides  I've read (including the offical wiki) the only useful example that uses reification is a function that can derive a generic Show function for any records. Beyond that, I'm not sure what else reify can be used for -- other than returning information on an expression or type.
 
 
 #### Examples
