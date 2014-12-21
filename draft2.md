@@ -44,9 +44,9 @@ data Lit = CharL Char
          | StringPrimL String	-- ^ A primitive C-style string, type Addr#
     deriving( Show, Eq, Data, Typeable )
 ```
-tokens represented by it make up literals defined throughout your syntax in the AST, as you can see in our example AST above. Within Language.Haskell.TH.syntax 35 generic data types are declared with the [Data.Data](http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Data.html) module. If you qurious about what the AST syntax is refering to study the [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#line-716).
+tokens represented by it make up literals defined throughout your syntax in the AST, as you can see in our example AST above. Within Language.Haskell.TH.syntax 35 generic data types are declared with the [Data.Data](http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Data.html) module. If you're qurious about what the AST syntax is refering to study the [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#line-716).
 
-The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction (I'll show you an example in the next section). These unique integer indentifier are used to keep quotations lexically scoped. (see the users guide [wiki](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html) for a more in depth explanation of TH's lexical scoping).
+The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction (I'll show you an example below). These unique integer indentifier are used to keep quotations lexically scoped. (see the users guide [wiki](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html) for a more in depth explanation of TH's lexical scoping).
 
 Let's bind the returned AST expression to a variable:
 ```bash
@@ -69,8 +69,7 @@ let fibsQ :: Q Exp
     fibsQ = [| fibs |]
 -- > runQ [| fibs |]
 -- VarE fibs_1627391264
--- The Q monad uses appended integers to give unique names to variables, 
--- and maintain lexical scoping.
+-- Here's an example of the Q monad using appended integers to give unique names to variables. 
 
 let fibQ :: Int -> Q Exp
     fibQ n = [| fibs !! n |]
@@ -85,6 +84,8 @@ Note, expressions and splices can be nested:
 Prelude Language.Haskell.TH> $(runQ [| fibs !! $( [| 8 |]) |])
 21
 ```
+
+If you're bored, good. I was just showing you the basics so you can get an intuitive feel for how to use the brackets. I'll talk about formal syntax next, and then when I get to debugging I'll show you so more fun examples.
 
 #### Syntax
 Template Haskell quotation expression come with 4 different parser types, and an extensive 5th optional type that allows one to define their own types of quotations, called quasi-quotations.
@@ -132,6 +133,12 @@ Prelude Language.Haskell.TH> runQ(myExp) >>= putStrLn.pprint
 If you want to see the expansion use the flag `-ddump-splices` when starting GHCi. 
 
 Now for probably, what I consider to be the most confusing section of Template Haskell -- Reification.
+
+A pretty big part of the Language.Haskell.TH module is a section call reification. Reification allows one to query the state of an quotation expression and get infomation about it. Specifically, reift returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info).
+TH introduces two new indentifiers for this specific function. Prefix an expression quotation with a single quote, and prefix type quotations with a double quote. It gives the reify function some context inwhich to interpret.
+
+_If you find reification confusing, so do I -- I don't like it either_ If you intend to use reify, don't use quotes in the names of your 
+
 
 #### Examples
 A good example to show what one can do with Template Haskell is a type safe haskell version of c's printf function (from [stdio.h](http://www.gnu.org/software/libc/manual/html_node/Formatted-Output-Functions.html)):
