@@ -169,7 +169,7 @@ Now for probably, what I consider to be the hardest aspect of Template Haskell t
 
 Reification allows one to query the state of an quotation expression or type and get infomation about it. Specifically, reify returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info).
 
-TH introduces two new indentifiers specifically for reification: Prefix an expression quotation (`Q Exp`) with a single quote, and prefix type quotation (`Q Type`) with a double quote to use reify on it. (If you intend to use reify, don't use quotes in the names of your expressions -- otherwise it wont parse correctly.)
+TH introduces two new indentifiers specifically for reification: Prefix an expression quotation (`Q Exp`) with a single quote, and prefix type quotations (`Q Type`) with a double quote to use reify on it. (If you intend to use reify, don't use quotes in the names of your expressions -- otherwise it wont parse correctly.)
 
 To use reify on a type, use double quotes:
 ```bash
@@ -179,7 +179,7 @@ Prelude Language.Haskell.TH> $(stringE . show =<< reify ''Bool)
 reifying a type returns the AST as represented by TH, here's the AST in a diagram of the boolean type from above:
 ![abstract syntax tree boolean](https://github.com/seanwestfall/templatehaskell/blob/master/syntax_tree_bool.png)
 
-The AST of a simple primative type like Bool produces a small tree, but when used on types deeper down the module chain, relatively large AST will be generated. Try reify on `''Lit` or `''Exp` to know what I mean, though reify can work on any Haskell type.
+The AST of a simple primative type like Bool produces a small tree, but when used on types deeper down the module chain, relatively large ASTs will be generated. Try reify on `''Lit` or `''Exp` to know what I mean, though reify can work on any Haskell type.
 
 To reify an expression, use single quotes, here's an example with our primeQ expression from above:
 ```bash
