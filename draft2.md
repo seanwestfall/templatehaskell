@@ -344,7 +344,35 @@ $ ./main
 ```
 
 #### Conclusion
+This guide was for the most part written from collecting information written in other guides on Template Haskell and quasi-quoting -- from both online and academic sources. Please check my bibliography to see where what came from what and so credit can be propertly given where it's due.
 
+In my opinion,
+
+Don't forget to checkout the API. Everything you need to know, you can for the most part find in the [source](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Lit).
+Also TH does in fact still have bugs, check the issue tracking page if you're dealing with a known issue: see [here](https://ghc.haskell.org/trac/ghc/query?status=new&status=assigned&status=reopened&component=Template+Haskell&order=priority).
+
+#### Bibliography
+http://research.microsoft.com/en-us/um/people/simonpj/papers/meta-haskell/meta-haskell.pdf
+Tim Sheard and Simon Peyton Jones
+
+http://quasimal.com/posts/2012-05-25-quasitext-and-quasiquoting.html
+2012 by Mike Ledger
+
+http://www.gigamonkeys.com/book/macros-defining-your-own.html
+2003-2005, Peter Seibel
+
+https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html
+The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.8.3
+
+https://www.haskell.org/haskellwiki/Template_Haskell
+
+http://web.archive.org/web/20100703060856/http://www.haskell.org/bz/thdoc.htm
+
+https://github.com/leonidas/codeblog/blob/master/2011/2011-12-27-template-haskell.md
+
+
+http://www.yesodweb.com/blog/2011/10/code-generation-conversation
+Greg Weber 2011
 
 #### License
 
