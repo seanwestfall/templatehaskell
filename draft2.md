@@ -344,7 +344,7 @@ $ ./main
 ```
 
 #### Conclusion
-This guide was for the most part written from collecting information written in other guides on Template Haskell and quasi-quoting -- from online, wiki, and academic sources. Please check my bibliography to see where what came from what so credit can be propertly given where it's due.
+This guide was for the most part written from collecting information written in other guides on Template Haskell, quasi-quoting, and Lisp macros -- from online, wiki, and academic sources. Please check my bibliography to see where what came from what so credit can be propertly given where it's due.
 
 Meta-programming is a powerful programming technique that can allow for the generation of user generated syntax extensions and DSLs. This is useful in that it can allow a programmer to generate custom code generating syntax extension without otherwise having to change the core language. Template Haskell in particular is especially powerful over similar programming langauge costructs (i.e. The C Preprocessor, Lisp's Macro system) in that it makes use of ASTs and reification (through a specific funtion). The examples presented above only scratch the surface of what's possible with reification -- imagine the ability to construction entire systems, and then use reify to build AST, then swap in and out entire modules, entirely with the use of Template Haskell.
 
