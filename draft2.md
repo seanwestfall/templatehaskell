@@ -79,7 +79,7 @@ Now run `$( ... )` to excute the expansion:
 Prelude Language.Haskell.TH> $(fibQ 22)
 17711
 ```
-TH splices in the expression that fibQ represents along with the variable (that is fibs !! n).
+TH splices in the expression that `fibQ` represents along with the variable (that is `fibs !! n`).
 
 Note, expressions and splices can be nested:
 ```bash
