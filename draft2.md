@@ -127,7 +127,7 @@ Prelude Language.Haskell.TH> runQ(myExp) >>= putStrLn.pprint
 1 GHC.Num.+ 2
 ```
 
-If you want to see the expansion of splices, use the flag `-ddump-splices` when starting GHCi : `ghci -XTemplateHaskell`.
+If you want to see the expansion of splices, use the flag `-ddump-splices` when starting GHCi : `ghci -XTemplateHaskell -ddump-splices`.
 
 Now let's test it on another fun example with primes:
 ```haskell
@@ -143,7 +143,8 @@ let doPrime :: (Integral a) => a -> a -> [a]
         | curr > m = []
         | otherwise = curr:doPrime (curr+1) m
         where curr = nextPrime n
--- our Q expression
+
+-- and our Q expression
 let primeQ :: Int -> Int -> Q Exp
     primeQ n m = [| doPrime n m |]
 ```
@@ -177,6 +178,7 @@ Prelude Language.Haskell.TH> $(stringE . show =<< reify ''Bool)
 ```
 reifying a type returns the AST as represented by TH, here's the AST in a diagram of the boolean type from above:
 ![abstract syntax tree boolean](https://github.com/seanwestfall/templatehaskell/blob/master/syntax_tree_bool.png)
+
 The AST of a simple primative type like Bool produces a small tree, but when used on types deeper down the module chain, relatively large AST will be generated. Try reify on `''Lit` or `''Exp` to know what I mean, though reify can work on any Haskell type.
 
 To reify an expression, use single quotes, here's an example with our primeQ expression from above:
@@ -264,6 +266,79 @@ running main will print out:
 $ ./main
 Hello World %%x%% 22 %%x%%
 Hello Russian with Love 5000
+```
+
+Now for an example that shows what one can do with reify -- a Generic Show that can produce a `Show` for any record type:
+
+*Main.hs*
+```haskell
+{- Main.hs -}
+module Main where
+import Derive
+ 
+data T = A Int String | B Integer | C
+$(deriveShow ''T)
+ 
+main = print [A 1 "s", B 2, C]  -- prints exactly <<[A 1 "s",B 2,C]>>
+```
+
+*Derive.hs*
+```haskell
+{- Derive.hs -}
+module Derive where
+ 
+import Language.Haskell.TH
+import Control.Monad
+ 
+data T1 = T1
+data T2 a = T2 a
+ 
+deriveShow t = do
+  -- Get list of constructors for type t
+  TyConI (DataD _ _ _ constructors _)  <-  reify t
+ 
+  -- Make `show` clause for one constructor:
+  --   show (A x1 x2) = "A "++show x1++" "++show x2
+  let showClause (NormalC name fields) = do
+        -- Name of constructor, i.e. "A". Will become string literal in generated code
+        let constructorName = nameBase name
+        -- Get variables for left and right side of function definition
+        (pats,vars) <- genPE (length fields)
+        -- Recursively build (" "++show x1++...++"") expression from [x1...] variables list
+        let f []       = [| "" |]
+            f (v:vars) = [| " " ++ show $v ++ $(f vars) |]
+        -- Generate function clause for one constructor
+        clause [conP name pats]                                 -- (A x1 x2)
+               (normalB [| constructorName ++ $(f vars) |]) []  -- "A "++show x1++" "++show x2
+ 
+  -- Make body for function `show`:
+  --   show (A x1 x2) = "A "++show x1++" "++show x2
+  --   show (B x1)    = "B "++show x1
+  --   show C         = "C"
+  showbody <- mapM showClause constructors
+ 
+  -- Generate template instance declaration and then replace
+  --   type name (T1) and function body (\x -> "text") with our data
+  d <- [d| instance Show T1 where
+             show x = "text"
+       |]
+  let    [InstanceD [] (AppT showt (ConT _T1)) [FunD showf _text]] = d
+  return [InstanceD [] (AppT showt (ConT t  )) [FunD showf showbody]]
+ 
+ 
+-- Generate n unique variables and return them in form of patterns and expressions
+genPE n = do
+  ids <- replicateM n (newName "x")
+  return (map varP ids, map varE ids)
+```
+Compile the following with:
+```bash
+$ ghc --make Main.hs -o main
+```
+running main will print out:
+```bash
+$ ./main
+[A 1 "s",B 2,C]
 ```
 
 #### Conclusion
