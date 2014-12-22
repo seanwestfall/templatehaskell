@@ -120,7 +120,7 @@ GHC stage restriction:
 Though, if you're just binding variables in GHCi with `let`, you don't have to worry about this -- only when you're compiling Haskell.
 
 #### Debugging and Reification
-You're probably wondering if you can evaluate a Q expression the other way, to see what the splice is evaluating. Ofcourse you can -- Run `runQ(Q exp) >>= putStrLn.pprint` to see what an expression with a Q Exp will evaluate to:
+You're probably wondering if you can evaluate a Q expression the other way, to see what the splice is evaluating. Ofcourse you can -- run `runQ(Q exp) >>= putStrLn.pprint` to see what an expression with a Q Exp will evaluate to:
 ```bash
 Prelude Language.Haskell.TH> let myExp :: Q Exp; myExp = runQ [| 1 + 2 |]
 Prelude Language.Haskell.TH> runQ(myExp) >>= putStrLn.pprint
@@ -163,7 +163,7 @@ Prelude Language.Haskell.TH> $(primeQ ($(primeQ 0 23) !! 3) 167)
     primeQ ($(primeQ 0 23) !! 3) 167 ======> doPrime 7 167
 [7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167]
 ```
-`-ddump-splices` and `>>= putStrLn.pprint` should come in handy when during debugging.
+`-ddump-splices` and `>>= putStrLn.pprint` should come in handy when debugging.
 
 Now for probably, what I consider to be the hardest aspect of Template Haskell to understand -- Reification.
 
