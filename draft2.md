@@ -169,7 +169,7 @@ Now for probably, what I consider to be the hardest aspect of Template Haskell t
 
 Reification allows one to query the state of Haskell [`Name`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Name)s and get infomation about it. Specifically, reify returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info) -- which returns data in a specifc format on any `Name` in Haskell, where the format and information depends on whether it's being interpreted in a type context or an expression context.
 
-TH introduces two new indentifiers specifically for reification: Prefix `Name`s to be evaluted in an expression context with a single quote, and prefix `Name`s to be evaluated in a type context with a double quote. Though, those `Names` names must be interpretable within those contexts to be reified. (If you intend to use reify on expressions, don't use quotes in the names of those expressions -- otherwise it wont parse correctly.)
+TH introduces two new indentifiers specifically for reification: Prefix `Name`s to be evaluted in an expression context with a single quote, and prefix `Name`s to be evaluated in a type context with a double quote. Though, those `Names` must be interpretable within those contexts to be reified. (If you intend to use reify on expressions, don't use quotes in the names of those expressions -- otherwise it wont parse correctly.)
 
 To use reify on a type, use double quotes:
 ```bash
