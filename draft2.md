@@ -2,13 +2,13 @@ Template Haskell
 ================
 A contribution to Oliver Charles' [24 Days of GHC Extensions](https://ocharles.org.uk/blog/pages/2014-12-01-24-days-of-ghc-extensions.html)
 
-Template Haskell is an extension of Haskell 98 that allows for compile-time metaprogramming -- allowing one to directly convert back and forth between concrete Haskell syntax and the underlying abstract syntax tree (AST) of GHC. Anyone familar with Lisp's macro system will immediately recognize the similarities -- though in Haskell, specific datatypes are used to represent an AST that is used to draw and splice back in code fragments. The ability to generate code at compile time allows one to implement macro-like expansions, polytypic programs, user directed optimization (such as inlining), and the generation of supporting data structures and functions from existing data structures and functions.
+Template Haskell is an extension of Haskell 98 that allows for compile-time metaprogramming -- allowing one to directly convert back and forth between concrete Haskell syntax and the underlying abstract syntax tree (AST) of GHC. Anyone familar with Lisp's macro system will immediately recognize the similarities -- though in Haskell, specific datatypes are used to represent an AST that is used to draw and splice back in code fragments. The ability to generate code at compile time allows one to implement macro-like expansions, polytypic programs, user directed optimization (such as inlining), and the generation of supporting data structures and functions from existing data structures and functions.[1]
 
-In brief,  Oxford brackets `[|` and `|]` are used to get the abstract syntax tree for the enclosed expression and 'splice' brackets `$(` and `)` are used to convert from the abstract syntax tree back into Haskell. The Quotation Monad is used to give unique names to the parsed tokens from the supplied Haskell code, and reification can be used to look up the name, type, constructor, and state of expression, and aswell as the AST of Haskell types.
+In brief,  Oxford brackets `[|` and `|]` are used to get the abstract syntax tree for the enclosed expression and 'splice' brackets `$(` and `)` are used to convert from the abstract syntax tree back into Haskell. The Quotation Monad is used to give unique names to the parsed tokens from the supplied Haskell code, and reification can be used to look up the name, type, constructor, and state of expression, and aswell as the AST of Haskell types.[4]
 
 Template Haskell was introduced by Tim Sheard and Simon Peyton Jones in their paper "Template Meta-Programming for Haskell" (The original paper can be found [here](http://research.microsoft.com/en-us/um/people/simonpj/papers/meta-haskell/meta-haskell.pdf)) in 2002, though its changed quite a bit since (see [here](http://research.microsoft.com/en-us/um/people/simonpj/tmp/notes2.ps)). It was inspired by C++ templates, though TH is functional more similar to a macro system. [Quasiquotation](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Quote.html) is often used in conjuntion with Template Haskell, but makes up a pretty big section, so I will only briefly describe it here. Only another full article of it own could do quasiquoting justice.
 
-In the wild, Template Haskell is used extensively by Yesod for routing and HTML template binding. Outside of Haskell, compile-time metaprogramming is used for the creation of Domain Specific Languages (DSLs), typically in the domains of testing and modeling, and generative metaprogramming (compile-time or not) for object relational mapping, typically for mapping database schemas to non-compiled code. And within Lisp, which is famous for it's macro system, metaprogramming is used to create syntax extensions (syntantic sugar), such as the syntax used in lisp comprehensions.
+In the wild, Template Haskell is used extensively by Yesod for routing and HTML template binding.[8] Outside of Haskell, compile-time metaprogramming is used for the creation of Domain Specific Languages (DSLs), typically in the domains of testing and modeling, and generative metaprogramming (compile-time or not) for object relational mapping, typically for mapping database schemas to non-compiled code. And within Lisp, which is famous for it's macro system, metaprogramming is used to create syntax extensions (syntantic sugar), such as the syntax used in lisp comprehensions.[3]
 
 ---
 _All code in this guide was excuted with GHCi version 7.6.3 and Template Haskell version 2.9.0.0_
@@ -57,7 +57,7 @@ Ta da, you converted concrete haskell to AST and then evaluated it. Though, as y
 
 It's possible to avoid having to modify the AST to splice it back, but you'll have to bind it to a variable, as my next example illustrates:
 
-In this example, the fibonacci sequence is generated using zipWith:
+In this example, the fibonacci sequence is generated using zipWith:[2]
 ```haskell
 let fibs :: [Integer]
     fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
@@ -106,7 +106,7 @@ Template Haskell quotation expression come with 4 different parser types, and an
    Prelude Language.Haskell.TH> runQ [p|(x,y)|]
    TupP [VarP x_5,VarP y_6]
    ```
- * Custom "quasi-quotations", have the form `["quoter"| ... |]`. The "quoter" can be anything except e, d, t, and p, and the token cannot contain spaces. Though, all GHC is doing is determing which parser to use based on the context within the oxford brackets.
+ * Custom "quasi-quotations", have the form `["quoter"| ... |]`. The "quoter" can be anything except e, d, t, and p, and the token cannot contain spaces. Though, all GHC is doing is determing which parser to use based on the context within the oxford brackets.[7]
 
    Quasi-quotations is a big second part to meta-programming. They're essentially what makes it possible to write DSLs. I'm not going to cover it here since this guide is pretty long as it is, but if you're interested, there are many guides to using quasi-quotations, find them [here](https://www.cs.drexel.edu/~mainland/publications/mainland07quasiquoting.pdf), [here](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html#th-quasiquotation), and [here] (https://www.fpcomplete.com/user/marcin/quasiquotation-101) (this one assumes you're familar with Parsec parsing).
 
@@ -129,7 +129,7 @@ Prelude Language.Haskell.TH> runQ(myExp) >>= putStrLn.pprint
 
 If you want to see the expansion of splices, use the flag `-ddump-splices` when starting GHCi : `ghci -XTemplateHaskell -ddump-splices`.
 
-Now let's test it on another fun example with primes:
+Now let's test it on another fun example with primes:[3]
 ```haskell
 let isPrime :: (Integral a) => a -> Bool
     isPrime k | k <=1 = False | otherwise = not $ elem 0 (map (mod k)[2..k-1])
@@ -193,7 +193,7 @@ Use reification of expressions to extract the types associated with the construc
 Reification is very useful from the standpoint of what one can do with an AST to draw and splice back in code fragments within a programming langauge. Below, in Examples, the second example shows how one can use reify to extract the types from a record's constructor to write a generic Show function that can generate a `Show` for any record.
 
 #### Examples
-A good example to show what one can do with Template Haskell is a type safe Haskell version of c's printf function (from [stdio.h](http://www.gnu.org/software/libc/manual/html_node/Formatted-Output-Functions.html)):
+A good example to show what one can do with Template Haskell is a type safe Haskell version of c's printf function (from [stdio.h](http://www.gnu.org/software/libc/manual/html_node/Formatted-Output-Functions.html)):[5]
 
 *Main.hs*
 ```haskell
@@ -270,7 +270,7 @@ Hello World %%x%% 22 %%x%%
 Hello Russian with Love 5000
 ```
 
-Now for an example that shows what one can do with reify -- a Generic Show that can produce a `Show` for any record type:
+Now for an example that shows what one can do with reify -- a Generic Show that can produce a `Show` for any record type:[6]
 
 *Main.hs*
 ```haskell
@@ -346,7 +346,7 @@ $ ./main
 #### Conclusion
 This guide was for the most part written from collecting information written in other guides on Template Haskell, quasi-quoting, and Lisp macros -- from online, wiki, and academic sources. Please check my bibliography to see where what came from what so credit can be propertly given where it's due.
 
-Meta-programming is a powerful programming technique that can allow for the generation of user generated syntax extensions and DSLs. This is useful in that it can allow a programmer to generate custom code generating syntax extension without otherwise having to change the core language. Template Haskell in particular is especially powerful over similar programming langauge costructs (i.e. The C Preprocessor, Lisp's Macro system) in that it makes use of ASTs and reification (through a specific funtion). The examples presented above only scratch the surface of what's possible with reification -- imagine the ability to construction entire systems, and then use reify to build AST, then swap in and out entire modules, entirely with the use of Template Haskell.
+Meta-programming is a powerful programming technique that can allow for the generation of user generated syntax extensions and DSLs. This is useful in that it can allow a programmer to generate custom code generating syntax extension without otherwise having to change the core language. Template Haskell in particular is especially powerful over similar programming langauge costructs (i.e. The C Preprocessor, Lisp's Macro system) in that it makes use of ASTs, reification (through a specific funtion), and -- much in the spirit of Haskell -- is type-safe. The examples presented above only scratch the surface of what's possible with reification -- imagine the ability to construction entire systems, and then use reify to build AST, then swap in and out entire modules, entirely with the use of Template Haskell.
 
 Some question that have arised within me from writing this article are: What are the limits of TH's data type system? Is it truely possible for TH to represent all of Haskell with the finite set of data types written into the module? Is it possible for future language features to defy this set? What are the limits of meta-programming -- TH, macros, and similar meta-prorgamming constructs make it possible to write code that writes code -- but are there limits to this -- is it possible to write a macro that can generate a macro, and so on indefinietly?
 
@@ -354,27 +354,38 @@ Don't forget to checkout the API. Everything you need to know, you can for the m
 Also TH does in fact have bugs, check the issue tracking page if you're dealing with a known issue: see [here](https://ghc.haskell.org/trac/ghc/query?status=new&status=assigned&status=reopened&component=Template+Haskell&order=priority).
 
 #### Bibliography
+
+1. Tim Sheard and Simon Peyton Jones, "Template meta-programming for Haskell," ACM SIGPLAN 2002 Haskell Workshop 3 (October 2002): 1-6, doi: 10.1145/581690.581691
 http://research.microsoft.com/en-us/um/people/simonpj/papers/meta-haskell/meta-haskell.pdf
-Tim Sheard and Simon Peyton Jones
+[1]:http://research.microsoft.com/en-us/um/people/simonpj/papers/meta-haskell/meta-haskell.pdf
 
+1. Mike Ledger, "A look at QuasiQuotation," 2012. 
 http://quasimal.com/posts/2012-05-25-quasitext-and-quasiquoting.html
-2012 by Mike Ledger
+[2]:http://quasimal.com/posts/2012-05-25-quasitext-and-quasiquoting.html
 
+1. Peter Seibel, _Practical Common Lisp_ (Apress, 2005)
 http://www.gigamonkeys.com/book/macros-defining-your-own.html
-2003-2005, Peter Seibel
+[3]:http://www.gigamonkeys.com/book/macros-defining-your-own.html
 
+1. The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.8.3, 2007 
 https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html
-The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.8.3
+[4]:https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html
 
+1. Template Haskell, Haskell Wiki, last updated October 2014: 
 https://www.haskell.org/haskellwiki/Template_Haskell
+[5]:https://www.haskell.org/haskellwiki/Template_Haskell
 
+1. Unknown Author, Template Haskell doc,
 http://web.archive.org/web/20100703060856/http://www.haskell.org/bz/thdoc.htm
+[6]:http://web.archive.org/web/20100703060856/http://www.haskell.org/bz/thdoc.htm
 
+1. Sami Hangaslammi, Basic Tutorial of Template Haskell, 2011:
 https://github.com/leonidas/codeblog/blob/master/2011/2011-12-27-template-haskell.md
+[7]:https://github.com/leonidas/codeblog/blob/master/2011/2011-12-27-template-haskell.md
 
-
+1. Greg Weber, Code that writes code and conversation about conversations, 2011:
 http://www.yesodweb.com/blog/2011/10/code-generation-conversation
-Greg Weber 2011
+[8]:http://www.yesodweb.com/blog/2011/10/code-generation-conversation
 
 #### License
 
