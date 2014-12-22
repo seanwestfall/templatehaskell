@@ -190,7 +190,7 @@ As you can see `info` returns different information depending on whether it's a 
 
 Use reification of expressions to extract the types associated with the construction of an expression, then reify those types to get it's structure in an AST. This allows one to generate the AST of any data type in Haskell -- no matter how deep into Haskell it gets.
 
-Reification is very useful from the standpoint of what one can do with an AST to draw and splice back in code fragments within a programming langauge. Below in Examples, the second example shows how one can use reify to extract the types from it's constructor to write a generic Show function that can generate a `Show` for any record.
+Reification is very useful from the standpoint of what one can do with an AST to draw and splice back in code fragments within a programming langauge. Below in Examples, the second example shows how one can use reify to extract the types from a record's constructor to write a generic Show function that can generate a `Show` for any record.
 
 #### Examples
 A good example to show what one can do with Template Haskell is a type safe haskell version of c's printf function (from [stdio.h](http://www.gnu.org/software/libc/manual/html_node/Formatted-Output-Functions.html)):
