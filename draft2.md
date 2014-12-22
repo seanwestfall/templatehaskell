@@ -167,7 +167,7 @@ Prelude Language.Haskell.TH> $(primeQ ($(primeQ 0 23) !! 3) 167)
 
 Now for probably, what I consider to be the hardest aspect of Template Haskell to understand -- Reification.
 
-Reification allows one to query the state of any Haskell [`name`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Name)s and get infomation about it. Specifically, reify returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info) -- which returns data in a speicifc format on any `name` in Haskell, the format and information dependent on whether it's being interpreted in a type context or an expression context.
+Reification allows one to query the state of Haskell [`name`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Name)s and get infomation about it. Specifically, reify returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info) -- which returns data in a speicifc format on any `name` in Haskell, the format and information dependent on whether it's being interpreted in a type context or an expression context.
 
 TH introduces two new indentifiers specifically for reification: Prefix `name`s to be evaluted in an expression context with a single quote, and prefix `name`s to be evaluated in a type context with a double quote -- to use reify on it. (If you intend to use reify on an expressions, don't use quotes in the names of those expressions -- otherwise it wont parse correctly.)
 
