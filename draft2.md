@@ -66,17 +66,10 @@ Prelude Language.Haskell.TH> $( return (InfixE (Just (LitE (IntegerL 1))) (VarE 
 ```
 But as you can see, indentifiers have to be defined with the `mkName` type in the AST to evaluate properly.
 
-Now lets try this on some thing slightly more sophisticated: the fibonacci sequence using zipWith:
+Now lets try this on the fibonacci sequence using zipWith:
 ```haskell
 let fibs :: [Integer]
     fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
--- care to see its AST, use runQ
-
-let fibsQ :: Q Exp
-    fibsQ = [| fibs |]
--- > runQ [| fibs |]
--- VarE fibs_1627391264
--- Here's an example of the Q monad using appended integers to give unique names to variables. 
 
 let fibQ :: Int -> Q Exp
     fibQ n = [| fibs !! n |]
@@ -86,13 +79,13 @@ Now run `$( ... )` to excute the expansion:
 Prelude Language.Haskell.TH> $(fibQ 22)
 17711
 ```
+TH splices in the expression that fibQ represents along with the variable (that is fibs !! n).
+
 Note, expressions and splices can be nested:
 ```bash
 Prelude Language.Haskell.TH> $(runQ [| fibs !! $( [| 8 |]) |])
 21
 ```
-
-If you're bored, good. I was just showing you the basics so you can get an intuitive feel for how to use the brackets. I'll talk about formal syntax next, and then when I get to debugging I'll show you some more fun examples.
 
 #### Syntax
 Template Haskell quotation expression come with 4 different parser types, and an extensive 5th optional type that allows one to define their own types of quotations, called quasi-quotations.
@@ -141,6 +134,45 @@ Prelude Language.Haskell.TH> runQ(myExp) >>= putStrLn.pprint
 ```
 
 If you want to see the expansion use the flag `-ddump-splices` when starting GHCi. 
+```bash
+ghci -XTemplateHaskell -ddump-splices
+Prelude> :m + Language.Haskell.TH
+Prelude Language.Haskell.TH>
+```
+Now let's test it on another fun example with primes:
+```haskell
+let isPrime :: (Integral a) => a -> Bool
+    isPrime k | k <=1 = False | otherwise = not $ elem 0 (map (mod k)[2..k-1])
+
+let nextPrime :: (Integral a) => a -> a
+    nextPrime n | isPrime n = n | otherwise = nextPrime (n+1)
+
+-- returns a list of all primes between n and m, using the nextPrime function
+let doPrime :: (Integral a) => a -> a -> [a]
+    doPrime n m
+        | curr > m = []
+        | otherwise = curr:doPrime (curr+1) m
+        where curr = nextPrime n
+-- our Q expression
+let primeQ :: Int -> Int -> Q Exp
+    primeQ n m = [| doPrime n m |]
+```
+```bash
+Prelude Language.Haskell.TH> $(primeQ 0 67)
+<interactive>:18:3-13: Splicing expression
+    primeQ 0 67 ======> doPrime 0 67
+[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67]
+```
+Now lets try it on a nested expression:
+```bash
+Prelude Language.Haskell.TH> $(primeQ ($(primeQ 0 23) !! 3) 167)
+<interactive>:20:13-23: Splicing expression
+    primeQ 0 23 ======> doPrime 0 23
+<interactive>:20:3-34: Splicing expression
+    primeQ ($(primeQ 0 23) !! 3) 167 ======> doPrime 7 167
+[7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167]
+```
+Use `-ddump-splices` and `>>= putStrLn.pprint` should be useful during debugging.
 
 Now for probably, what I consider to be the most confusing section of Template Haskell -- Reification.
 
