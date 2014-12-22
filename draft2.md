@@ -257,6 +257,8 @@ printf :: String -> Q Exp
 printf format = lamE (args fmt) (body fmt)
     where fmt = tokenize format
 ```
+Notice that we had to separate the splicing and the expression definitions in separate modules, as mentioned in the syntax section above.
+
 Compile the following with:
 ```bash
 $ ghc --make Main.hs -o main
