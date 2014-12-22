@@ -78,7 +78,7 @@ Prelude Language.Haskell.TH> $(runQ [| fibs !! $( [| 8 |]) |])
 21
 ```
 
-I'll explain some very specific syntax next, but after, some more impressive examples that show the possibilities of splicing and ASTs.
+I'll explain TH's syntax next -- but after, I'll show some more impressive examples that show the possibilities of splicing and ASTs.
 
 #### Syntax
 Template Haskell quotation expression come with 4 different parser types, and an extensive 5th optional type that allows one to define their own types of quotations, called quasi-quotations.
