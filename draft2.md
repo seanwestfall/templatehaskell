@@ -188,7 +188,7 @@ Prelude Language.Haskell.TH> $(stringE . show =<< reify 'primeQ)
 ```
 As you can see `info` returns different information depending on whether it's a type or an expression. A type returns it's structure in TH's AST semantics. An expression returns information regarding it's name, type, it's constructor, and it's fixity.
 
-Use reification of expressions to extract the types associated with the construction an expression, then reify those types to get it's structure in an AST. This allows one to generate the AST of any data type in Haskell -- no matter how deep into Haskell it gets -- allowing for an unlimited ability to express Haskell in TH's AST.
+Use reification of expressions to extract the types associated with the construction of an expression, then reify those types to get it's structure in an AST. This allows one to generate the AST of any data type in Haskell -- no matter how deep into Haskell it gets -- allowing for an unlimited ability to express Haskell in TH's AST.
 
 _If you find reification confusing -- so did I_ , but it's very useful from the standpoint of what one can do with an AST to draw and splice back in code fragments within a programming langauge -- this isn't a feature available in other languages that feature similar construts (for instance lisp or c).
 
