@@ -2,11 +2,11 @@ Template Haskell
 ================
 A contribution to Oliver Charles' [24 Days of GHC Extensions](https://ocharles.org.uk/blog/pages/2014-12-01-24-days-of-ghc-extensions.html)
 
-Template Haskell is an extension of Haskell 98 that allows for compile-time metaprogramming -- allowing one to directly convert back and forth between concrete Haskell syntax and the underlying abstract syntax tree (AST) of GHC. Anyone familar with Lisp's macro system will immediately recognize the similarities -- though in Haskell, specific datatypes are used to represent the AST. The ability to generate code at compile time allows one to implement macro-like expansions, as well as polytypic programs, user directed optimization (such as inlining), and the generation of supporting data structures and functions from existing data structures and functions.
+Template Haskell is an extension of Haskell 98 that allows for compile-time metaprogramming -- allowing one to directly convert back and forth between concrete Haskell syntax and the underlying abstract syntax tree (AST) of GHC. Anyone familar with Lisp's macro system will immediately recognize the similarities -- though in Haskell, specific datatypes are used to represent an AST that is used to draw and splice back in code fragments. The ability to generate code at compile time allows one to implement macro-like expansions, polytypic programs, user directed optimization (such as inlining), and the generation of supporting data structures and functions from existing data structures and functions.
 
-In brief,  Oxford brackets `[|` and `|]` are used to get the abstract syntax tree for the enclosed expression and 'splice' brackets `$(` and `)` are used to convert from the abstract syntax tree back into the haskell code. The quotation monad is used to give unique names to the parsed tokens from the supplied haskell code, and reification can be used to look up the state, type, global indentifies within GHC internal symbol table.
+In brief,  Oxford brackets `[|` and `|]` are used to get the abstract syntax tree for the enclosed expression and 'splice' brackets `$(` and `)` are used to convert from the abstract syntax tree back into Haskell. The Quotation Monad is used to give unique names to the parsed tokens from the supplied Haskell code, and reification can be used to look up the name, type, constructor, and state of Q Expression, and aswell as the AST of Q Types.
 
-Template Haskell was introduced by Tim Sheard and Simon Peyton Jones in their paper "Template Meta-Programming for Haskell" (The original paper can be found [here]()) in 2002, though its changed quite a bit since (see [here]()). It was inspired by C++ templates, though TH is functional more similar to a macro system. The Haskell extension Quasiquotation is often used in conjuntion with Template Haskell, so I will briefly describe it here, but is extensive enough only another full post could do it justice.
+Template Haskell was introduced by Tim Sheard and Simon Peyton Jones in their paper "Template Meta-Programming for Haskell" (The original paper can be found [here](http://research.microsoft.com/en-us/um/people/simonpj/papers/meta-haskell/meta-haskell.pdf)) in 2002, though its changed quite a bit since (see [here](http://research.microsoft.com/en-us/um/people/simonpj/tmp/notes2.ps)). It was inspired by C++ templates, though TH is functional more similar to a macro system. The Haskell extension Quasiquotation is often used in conjuntion with Template Haskell, so I will briefly describe it here, but is extensive enough only another full post could do it justice.
 
 In the wild, Template Haskell is used extensively by Yesod for routing and HTML template binding. Outside of Haskell, compile-time metaprogramming is used for the creation of Domain Specific Languages (DSLs), typically in the domains of testing and modeling, and generative metaprogramming (compile-time or not) for object relational mapping, typically for mapping database schemas to non-compiled code. And within Lisp, which is famous for it's macro system, metaprogramming is used to create syntax extensions (syntantic sugar), such as the syntax used for lisp comprehensions.
 
@@ -44,29 +44,20 @@ data Lit = CharL Char
          | StringPrimL String	-- ^ A primitive C-style string, type Addr#
     deriving( Show, Eq, Data, Typeable )
 ```
-tokens represented by it make up literals defined throughout your syntax in the AST, as you can see in our example AST above. Within Language.Haskell.TH.syntax 35 generic data types are declared with the [Data.Data](http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Data.html) module. If you're qurious about what the AST syntax is refering to study the [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#line-716).
+tokens represented by it make up literals defined throughout your syntax in the AST, as you can see in our example AST above. Within Language.Haskell.TH.syntax, 35 generic data types are declared with the [Data.Data](http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Data.html) module. If you're qurious about what the AST syntax is refering to study the [source](http://hackage.haskell.org/package/template-haskell-2.7.0.0/docs/src/Language-Haskell-TH-Syntax.html#line-716).
 
-The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction (I'll show you an example below). These unique integer indentifier are used to keep quotations lexically scoped. (see the users guide [wiki](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html) for a more in depth explanation of TH's lexical scoping).
+The [Q](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Q) monad handles the expressions typing via context, and also gives it a unique [name](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/src/Language-Haskell-TH-Syntax.html#newName) by appending an integer at the end of the expression name to handle scoping distinction. Quotations are lexically scoped and the Q monad handles this using it's naming shemes. (see the users guide [wiki](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html) for a more in depth explanation of TH's lexical scoping).
 
-Let's bind the returned AST expression to a variable:
-```bash
-Prelude Language.Haskell.TH> let myExp :: Q Exp; myExp = runQ [| 1 + 2 |]
-```
-`myExp` contains the AST expression (notice the `Q Exp` type, more on this later) -- now lets use the splice brackets, `$( ... )`, to return it back to haskell:
-```bash
-Prelude Language.Haskell.TH> $(myExp)
-3
-```
-and ta da, you converted concrete haskell to AST and then evaluated it with the splice brackets.
-
-You don't have to declare the expression to a variable to use the splice bracket on it, you can do it like this:
+Let's bind the returned AST expression from the example above to Haskell and evaluate it, using the splice brackets:
 ```bash
 Prelude Language.Haskell.TH> $( return (InfixE (Just (LitE (IntegerL 1))) (VarE (mkName "+")) (Just (LitE (IntegerL 2)))))
 3
 ```
-But as you can see, indentifiers have to be defined with the `mkName` type in the AST to evaluate properly.
+Ta da, you converted concrete haskell to AST and then evaluated it. Though, as you can see, indentifiers have to be defined with the `mkName` type in the AST to evaluate properly.
 
-Now lets try this on the fibonacci sequence using zipWith:
+It's possible to avoid having to modify the AST to splice it back, but you'll have to bind it to a variable, as my next example illustrates:
+
+This example generates the fibonacci sequence using zipWith:
 ```haskell
 let fibs :: [Integer]
     fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
@@ -86,6 +77,8 @@ Note, expressions and splices can be nested:
 Prelude Language.Haskell.TH> $(runQ [| fibs !! $( [| 8 |]) |])
 21
 ```
+
+I'll explain TH's syntax next -- but after, I'll show some more impressive examples that show the possibilities of splicing and ASTs.
 
 #### Syntax
 Template Haskell quotation expression come with 4 different parser types, and an extensive 5th optional type that allows one to define their own types of quotations, called quasi-quotations.
@@ -115,7 +108,7 @@ Template Haskell quotation expression come with 4 different parser types, and an
    ```
  * Custom "quasi-quotations", have the form `["quoter"| ... |]`. The "quoter" can be anything except e, d, t, and p, and the token cannot contain spaces. Though, all GHC is doing is determing which parser to use based on the context within the oxford brackets.
 
-   Quasi-quotations are a big second part to meta-programming. They're essentially what makes it possible to write DSLs. I'm not going to cover it here since this guide is pretty long as it is, but if you're interested, there are many guides to using quasi-quotations, find them [here](https://www.cs.drexel.edu/~mainland/publications/mainland07quasiquoting.pdf), [here](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html#th-quasiquotation), and [here] (https://www.fpcomplete.com/user/marcin/quasiquotation-101)(this one assumes you're familar with Parsec parsing).
+   Quasi-quotations is a big second part to meta-programming. They're essentially what makes it possible to write DSLs. I'm not going to cover it here since this guide is pretty long as it is, but if you're interested, there are many guides to using quasi-quotations, find them [here](https://www.cs.drexel.edu/~mainland/publications/mainland07quasiquoting.pdf), [here](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/template-haskell.html#th-quasiquotation), and [here] (https://www.fpcomplete.com/user/marcin/quasiquotation-101) (this one assumes you're familar with Parsec parsing).
 
 
 An important restriction on Template Haskell to remember is _when inside a splice you can only call functions defined in imported modules, not functions defined elsewhere in the same module._ Quotations and splice have to be defined in separate modules, otherwise you'll see this error:
@@ -124,21 +117,18 @@ GHC stage restriction:
   `...' is used in a top-level splice or annotation,
   and must be imported, not defined locally
 ```
+Though, if you're just binding variables in GHCi with `let`, you don't have to worry about this -- only when you're compiling Haskell.
 
 #### Debugging and Reification
-You're probably wondering if you can evaluate a Q expression the other way, to see what the splice is evaluating. Ofcourse you can -- Run `runQ(Q exp) >>= putStrLn.pprint` to see what an expression with a Q Exp will evaluate to:
+You're probably wondering if you can evaluate a Q expression the other way, to see what the splice is evaluating. Ofcourse you can -- run `runQ(Q exp) >>= putStrLn.pprint` to see what an expression with a Q Exp will evaluate to:
 ```bash
 Prelude Language.Haskell.TH> let myExp :: Q Exp; myExp = runQ [| 1 + 2 |]
 Prelude Language.Haskell.TH> runQ(myExp) >>= putStrLn.pprint
 1 GHC.Num.+ 2
 ```
 
-If you want to see the expansion use the flag `-ddump-splices` when starting GHCi. 
-```bash
-ghci -XTemplateHaskell -ddump-splices
-Prelude> :m + Language.Haskell.TH
-Prelude Language.Haskell.TH>
-```
+If you want to see the expansion of splices, use the flag `-ddump-splices` when starting GHCi : `ghci -XTemplateHaskell -ddump-splices`.
+
 Now let's test it on another fun example with primes:
 ```haskell
 let isPrime :: (Integral a) => a -> Bool
@@ -153,7 +143,8 @@ let doPrime :: (Integral a) => a -> a -> [a]
         | curr > m = []
         | otherwise = curr:doPrime (curr+1) m
         where curr = nextPrime n
--- our Q expression
+
+-- and our Q expression
 let primeQ :: Int -> Int -> Q Exp
     primeQ n m = [| doPrime n m |]
 ```
@@ -163,7 +154,7 @@ Prelude Language.Haskell.TH> $(primeQ 0 67)
     primeQ 0 67 ======> doPrime 0 67
 [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67]
 ```
-Now lets try it on a nested expression:
+Try it on a nested expression, to really see how useful the dump-splices flag is:
 ```bash
 Prelude Language.Haskell.TH> $(primeQ ($(primeQ 0 23) !! 3) 167)
 <interactive>:20:13-23: Splicing expression
@@ -172,26 +163,34 @@ Prelude Language.Haskell.TH> $(primeQ ($(primeQ 0 23) !! 3) 167)
     primeQ ($(primeQ 0 23) !! 3) 167 ======> doPrime 7 167
 [7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167]
 ```
-Use `-ddump-splices` and `>>= putStrLn.pprint` should be useful during debugging.
+`-ddump-splices` and `>>= putStrLn.pprint` should come in handy when debugging.
 
-Now for probably, what I consider to be the most confusing section of Template Haskell -- Reification.
+Now for probably, what I consider to be the hardest aspect of Template Haskell to understand -- Reification.
 
-Reification allows one to query the state of an quotation expression or type and get infomation about it. Specifically, reify returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info), see the doc for specifically what -- but probably the most relavent information would be 
+Reification allows one to query the state of Haskell [`Name`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Name)s and get infomation about it. Specifically, reify returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info) -- which returns data in a specifc format on any `Name` in Haskell, where the format and information depends on whether it's being interpreted in a type context or an expression context.
 
-TH introduces two new indentifiers for this specifically in reification. Prefix an expression quotation (`Q Exp`) with a single quote, and prefix type quotations (`Q Type`) with a double quote. It gives the reify function some context inwhich to interpret, and in which case will return the type for expressions and the structure for types. If you intend to use reify, don't use quotes in the names of your expressions -- otherwise it wont parse correctly.
+TH introduces two new indentifiers specifically for reification: Prefix `Name`s to be evaluted in an expression context with a single quote, and prefix `Name`s to be evaluated in a type context with a double quote. Though, those `Names` must be interpretable within those contexts to be reified. (If you intend to use reify on expressions, don't use quotes in the names of those expressions -- otherwise it wont parse correctly.)
+
 To use reify on a type, use double quotes:
 ```bash
 Prelude Language.Haskell.TH> $(stringE . show =<< reify ''Bool)
 "TyConI (DataD [] GHC.Types.Bool [] [NormalC GHC.Types.False [],NormalC GHC.Types.True []] [])"
 ```
-and to use it on an expression, use single quotes:
+reifying a type returns the AST as represented by TH, here's the AST in a diagram of the boolean type from above:
+![abstract syntax tree boolean](https://github.com/seanwestfall/templatehaskell/blob/master/syntax_tree_bool.png)
+
+The AST of a simple primative type like Bool produces a small tree, but when used on types deeper down the module chain, relatively large ASTs will be generated. Try reify on `''Lit` or `''Exp` to know what I mean, though reify can work on any Haskell type.
+
+To reify an expression, use single quotes, here's an example with our `primeQ` expression from above:
 ```bash
-Prelude Language.Haskell.TH> $(stringE . show =<< reify 'myExp)
-"VarI myExp_1627395486 (AppT (ConT Language.Haskell.TH.Syntax.Q) (ConT Language.Haskell.TH.Syntax.Exp)) Nothing (Fixity 9 InfixL)"
+Prelude Language.Haskell.TH> $(stringE . show =<< reify 'primeQ)
+"VarI primeQ_1627395913 (AppT (AppT ArrowT (ConT GHC.Types.Int)) (AppT (AppT ArrowT (ConT GHC.Types.Int)) (AppT (ConT Language.Haskell.TH.Syntax.Q) (ConT Language.Haskell.TH.Syntax.Exp)))) Nothing (Fixity 9 InfixL)"
 ```
+As you can see `info` returns different information depending on whether it's a type or an expression. A type returns it's structure in TH's AST semantics. An expression returns information regarding it's name, type, it's constructor, and it's fixity.
 
-_If you find reification confusing, so do I -- I don't like it either_ In all the guides  I've read (including the offical wiki) the only useful example that uses reification is a function that can derive a generic Show function for any records. Beyond that, I'm not sure what else reify can be used for -- other than returning information on an expression or type.
+Use reification of expressions to extract the types associated with the construction of an expression, then reify those types to get it's structure in an AST. This allows one to generate the AST of any data type in Haskell -- no matter how deep into Haskell it gets.
 
+Reification is very useful from the standpoint of what one can do with an AST to draw and splice back in code fragments within a programming langauge. Below in Examples, the second example shows how one can use reify to extract the types from it's constructor to write a generic Show function that can generate a `Show` for any record.
 
 #### Examples
 A good example to show what one can do with Template Haskell is a type safe haskell version of c's printf function (from [stdio.h](http://www.gnu.org/software/libc/manual/html_node/Formatted-Output-Functions.html)):
@@ -258,6 +257,8 @@ printf :: String -> Q Exp
 printf format = lamE (args fmt) (body fmt)
     where fmt = tokenize format
 ```
+Notice that we had to separate the splicing and the expression definitions in separate modules, as mentioned in the syntax section above.
+
 Compile the following with:
 ```bash
 $ ghc --make Main.hs -o main
@@ -267,6 +268,79 @@ running main will print out:
 $ ./main
 Hello World %%x%% 22 %%x%%
 Hello Russian with Love 5000
+```
+
+Now for an example that shows what one can do with reify -- a Generic Show that can produce a `Show` for any record type:
+
+*Main.hs*
+```haskell
+{- Main.hs -}
+module Main where
+import Derive
+ 
+data T = A Int String | B Integer | C
+$(deriveShow ''T)
+ 
+main = print [A 1 "s", B 2, C]  -- prints exactly <<[A 1 "s",B 2,C]>>
+```
+
+*Derive.hs*
+```haskell
+{- Derive.hs -}
+module Derive where
+ 
+import Language.Haskell.TH
+import Control.Monad
+ 
+data T1 = T1
+data T2 a = T2 a
+ 
+deriveShow t = do
+  -- Get list of constructors for type t
+  TyConI (DataD _ _ _ constructors _)  <-  reify t
+ 
+  -- Make `show` clause for one constructor:
+  --   show (A x1 x2) = "A "++show x1++" "++show x2
+  let showClause (NormalC name fields) = do
+        -- Name of constructor, i.e. "A". Will become string literal in generated code
+        let constructorName = nameBase name
+        -- Get variables for left and right side of function definition
+        (pats,vars) <- genPE (length fields)
+        -- Recursively build (" "++show x1++...++"") expression from [x1...] variables list
+        let f []       = [| "" |]
+            f (v:vars) = [| " " ++ show $v ++ $(f vars) |]
+        -- Generate function clause for one constructor
+        clause [conP name pats]                                 -- (A x1 x2)
+               (normalB [| constructorName ++ $(f vars) |]) []  -- "A "++show x1++" "++show x2
+ 
+  -- Make body for function `show`:
+  --   show (A x1 x2) = "A "++show x1++" "++show x2
+  --   show (B x1)    = "B "++show x1
+  --   show C         = "C"
+  showbody <- mapM showClause constructors
+ 
+  -- Generate template instance declaration and then replace
+  --   type name (T1) and function body (\x -> "text") with our data
+  d <- [d| instance Show T1 where
+             show x = "text"
+       |]
+  let    [InstanceD [] (AppT showt (ConT _T1)) [FunD showf _text]] = d
+  return [InstanceD [] (AppT showt (ConT t  )) [FunD showf showbody]]
+ 
+ 
+-- Generate n unique variables and return them in form of patterns and expressions
+genPE n = do
+  ids <- replicateM n (newName "x")
+  return (map varP ids, map varE ids)
+```
+Compile the following with:
+```bash
+$ ghc --make Main.hs -o main
+```
+running main will print out:
+```bash
+$ ./main
+[A 1 "s",B 2,C]
 ```
 
 #### Conclusion
