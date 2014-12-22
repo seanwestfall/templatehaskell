@@ -169,7 +169,7 @@ Now for probably, what I consider to be the hardest aspect of Template Haskell t
 
 Reification allows one to query the state of an quotation expression or type and get infomation about it. Specifically, reify returns a data type called [`info`](http://hackage.haskell.org/package/template-haskell-2.9.0.0/docs/Language-Haskell-TH-Syntax.html#t:Info) -- which returns data in a speicifc format on Q expressions and types.
 
-TH introduces two new indentifiers specifically for reification: Prefix an expressions with a single quote, and prefix types with a double quote, to use reify on it -- these names don't necessarily have to be Q expressions. (If you intend to use reify, don't use quotes in the names of your expressions -- otherwise it wont parse correctly.)
+TH introduces two new indentifiers specifically for reification: Prefix an expressions with a single quote, and prefix types with a double quote, to use reify on it -- these names don't necessarily have to be Q expressions. (If you intend to use reify on Q expressions, don't use quotes in the names of your expressions -- otherwise it wont parse correctly.)
 
 To use reify on a type, use double quotes:
 ```bash
@@ -181,7 +181,7 @@ reifying a type returns the AST as represented by TH, here's the AST in a diagra
 
 The AST of a simple primative type like Bool produces a small tree, but when used on types deeper down the module chain, relatively large ASTs will be generated. Try reify on `''Lit` or `''Exp` to know what I mean, though reify can work on any Haskell type.
 
-To reify an expression, use single quotes, here's an example with our primeQ expression from above:
+To reify an expression, use single quotes, here's an example with our `primeQ` expression from above:
 ```bash
 Prelude Language.Haskell.TH> $(stringE . show =<< reify 'primeQ)
 "VarI primeQ_1627395913 (AppT (AppT ArrowT (ConT GHC.Types.Int)) (AppT (AppT ArrowT (ConT GHC.Types.Int)) (AppT (ConT Language.Haskell.TH.Syntax.Q) (ConT Language.Haskell.TH.Syntax.Exp)))) Nothing (Fixity 9 InfixL)"
