@@ -1,5 +1,6 @@
 Template Haskell
 ================
+A contribution to Oliver Charles' [24 Days of GHC Extensions](https://ocharles.org.uk/blog/). You can find the submitted post here: [https://ocharles.org.uk/blog/guest-posts/2014-12-22-template-haskell.html](https://ocharles.org.uk/blog/guest-posts/2014-12-22-template-haskell.html)
 
 Template Haskell is an extension of Haskell 98 that allows for compile-time metaprogramming -- allowing one to directly convert back and forth between concrete Haskell syntax and the underlying abstract syntax tree (AST) of GHC. Anyone familiar with Lisp's macro system will immediately recognize the similarities -- though in Haskell, specific datatypes are used to represent an AST that is used to draw and splice back in code fragments. The ability to generate code at compile time allows one to implement macro-like expansions, polytypic programs, user directed optimization (such as inlining), and the generation of supporting data structures and functions from existing data structures and functions.[1]
 
