@@ -186,7 +186,7 @@ To reify an expression, use single quotes, here's an example with our `primeQ` e
 Prelude Language.Haskell.TH> $(stringE . show =<< reify 'primeQ)
 "VarI primeQ_1627395913 (AppT (AppT ArrowT (ConT GHC.Types.Int)) (AppT (AppT ArrowT (ConT GHC.Types.Int)) (AppT (ConT Language.Haskell.TH.Syntax.Q) (ConT Language.Haskell.TH.Syntax.Exp)))) Nothing (Fixity 9 InfixL)"
 ```
-As you can see `info` returns different information depending on whether it's a type or an expression. A type returns its structure in TH's AST semantics. An expression returns information regarding its name, type, it's constructor, and it's fixity.
+As you can see `info` returns different information depending on whether it's a type or an expression. A type returns its structure in TH's AST syntax. An expression returns information regarding its name, type, it's constructor, and it's fixity.
 
 Use reification of expressions to extract the types associated with the construction of an expression, then reify those types to get its structure in an AST. This allows one to generate the AST of any data type in Haskell -- no matter how deep into Haskell it gets.
 
